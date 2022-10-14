@@ -20,6 +20,12 @@ public class User {
     @Property
     private String name;
     @Property
+    private String email;
+    @Property
+    private String password;
+    @Property
+    private Set<String> role;
+    @Property
     private LocalDate birthDate;
 
     @Relationship(type = "IS_FRIENDS_WITH", direction = OUTGOING)
