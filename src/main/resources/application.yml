@@ -1,0 +1,18 @@
+spring:
+  security:
+    user:
+      name: user
+      password: password
+  neo4j:
+    authentication:
+      username: neo4j
+      password: password
+    uri: bolt://localhost:7687
+    database: dogebook
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          neo4j: DEBUG
