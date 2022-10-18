@@ -46,6 +46,7 @@ public class UserResource {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<User>> getUsers(Principal principal) {
+        List<User> l = userRepository.findAll();
         return ResponseEntity.ok(userRepository.findAll());
     }
 
