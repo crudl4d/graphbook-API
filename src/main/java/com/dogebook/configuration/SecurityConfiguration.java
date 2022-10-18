@@ -14,6 +14,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -30,19 +36,32 @@ public class SecurityConfiguration {
             "/users"
     };
 
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Collections.singletonList("http://localhost**"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "content-type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "content-type"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.httpBasic()
                 .and()
                 .csrf().disable()
-                .authorizeRequests()
-                .antMatchers("/**")
-                .hasAuthority("USER")
-                .antMatchers("/**")
-                .hasAuthority("ADMIN")
-                .and()
-                .formLogin();
+                .cors().disable()
+//                .authorizeRequests()
+//                .antMatchers("/**")
+//                .hasAuthority("USER")
+//                .antMatchers("/**")
+//                .hasAuthority("ADMIN")
+//                .antMatchers("/users/register").permitAll()
+//                .anyRequest().authenticated();
+                ;
         return http.build();
     }
 

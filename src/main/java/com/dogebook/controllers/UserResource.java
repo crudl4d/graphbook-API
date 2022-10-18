@@ -1,11 +1,15 @@
 package com.dogebook.controllers;
 
+import com.dogebook.configuration.UserContext;
 import com.dogebook.entities.User;
 import com.dogebook.repositories.UserRepository;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -24,12 +28,17 @@ public class UserResource {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/login")
-    ResponseEntity login(Principal principal) {
-        return new ResponseEntity(Map.of("", ""), HttpStatus.OK);
+    @PostMapping("/login")
+    ResponseEntity<Map<?, ?>> login(Principal principal) {
+        UserContext userContext = ((UserContext) ((UsernamePasswordAuthenticationToken) principal).getPrincipal());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("id", userContext.getId().toString());
+        headers.add("name", userContext.getName());
+        headers.add("email", userContext.getEmail());
+        return new ResponseEntity(headers, HttpStatus.OK);
     }
     @PostMapping
-    ResponseEntity<Void> createUser(@RequestBody User user) throws URISyntaxException {
+    ResponseEntity<Void> registerUser(@RequestBody User user) throws URISyntaxException {
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         Long id = userRepository.save(user).getId();
         return ResponseEntity.created(new URI("/users/" + id)).build();

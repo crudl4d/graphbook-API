@@ -49,7 +49,7 @@ public class CurrentUserDetailsService implements UserDetailsService {
                 accountNonLocked, authorities);
         userContext.setId(user.getId());
         userContext.setEmail(user.getEmail());
-        userContext.setName(user.getName());
+        userContext.setName(user.getFirstName());
         return userContext;
     }
 
