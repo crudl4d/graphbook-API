@@ -6,13 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -32,6 +27,7 @@ public class SecurityConfiguration {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(currentUserDetailsService);
     }
+
     private static final String[] ADMIN = {
             "/users"
     };
@@ -40,7 +36,7 @@ public class SecurityConfiguration {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Collections.singletonList("http://localhost**"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "content-type"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "content-type"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -54,14 +50,13 @@ public class SecurityConfiguration {
                 .and()
                 .csrf().disable()
                 .cors().disable()
-//                .authorizeRequests()
-//                .antMatchers("/**")
-//                .hasAuthority("USER")
-//                .antMatchers("/**")
-//                .hasAuthority("ADMIN")
-//                .antMatchers("/users/register").permitAll()
-//                .anyRequest().authenticated();
-                ;
+                .authorizeRequests()
+                .antMatchers("/**")
+                .hasAuthority("USER")
+                .antMatchers("/**")
+                .hasAuthority("ADMIN")
+                .antMatchers("/users/register").permitAll()
+                .anyRequest().authenticated();
         return http.build();
     }
 

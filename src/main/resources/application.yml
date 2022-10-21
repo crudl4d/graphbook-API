@@ -4,6 +4,7 @@ spring:
     user:
       name: user
       password: password
+  # Default values for local database connection, can be overridden by environment variables
   neo4j:
     authentication:
       username: neo4j

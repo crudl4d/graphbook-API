@@ -5,22 +5,24 @@ import com.dogebook.entities.User;
 import com.dogebook.repositories.FriendRequestRepository;
 import com.dogebook.repositories.UserRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.http.MediaType;
+import lombok.NoArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Optional;
 
 @AllArgsConstructor
+@NoArgsConstructor
 @RestController
 @RequestMapping("/friends")
 public class FriendResource {
 
-    private final FriendRequestRepository friendRequestRepository;
-    private final UserRepository userRepository;
+    private FriendRequestRepository friendRequestRepository;
+    private UserRepository userRepository;
 
     @PostMapping
     ResponseEntity<Void> sendFriendRequest(@RequestParam Long userId) throws URISyntaxException {

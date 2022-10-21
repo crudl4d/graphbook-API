@@ -1,7 +1,6 @@
 package com.dogebook.configuration;
 
 import com.dogebook.repositories.UserRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -16,24 +15,19 @@ import java.util.List;
 import java.util.Set;
 
 @Service
-@AllArgsConstructor
 public class CurrentUserDetailsService implements UserDetailsService {
+
+    public CurrentUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     private UserRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-
-        //Try to find user and its roles, for example here we try to get it from database via a DAO object
-        //Do not confuse this foo.bar.User with CurrentUser or spring User, this is a temporary object which holds user info stored in database
         com.dogebook.entities.User user = userRepository.findByEmail(username);
-
-        //Build user Authority. some how a convert from your custom roles which are in database to spring GrantedAuthority
         List<GrantedAuthority> authorities = buildUserAuthority(user.getRole());
-
-        //The magic is happen in this private method !
         return buildUserForAuthentication(user, authorities);
-
     }
 
     private User buildUserForAuthentication(com.dogebook.entities.User user,
@@ -55,13 +49,11 @@ public class CurrentUserDetailsService implements UserDetailsService {
 
     private List<GrantedAuthority> buildUserAuthority(Set<String> roles) {
 
-        Set<GrantedAuthority> setAuths = new HashSet<GrantedAuthority>();
-
-        // Build user's authorities
+        Set<GrantedAuthority> setAuths = new HashSet<>();
         for (String role : roles) {
             setAuths.add(new SimpleGrantedAuthority(role));
         }
 
-        return new ArrayList<GrantedAuthority>(setAuths);
+        return new ArrayList<>(setAuths);
     }
 }
