@@ -4,6 +4,9 @@ import com.dogebook.configuration.UserContext;
 import com.dogebook.entities.User;
 import com.dogebook.repositories.UserRepository;
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -44,8 +47,9 @@ public class UserResource {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<List<User>> getUsers(Principal principal) {
-        return ResponseEntity.ok(userRepository.findAll());
+    ResponseEntity<List<User>> getUsers(@RequestParam @NotNull Integer page, Principal principal) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return ResponseEntity.ok(userRepository.findAll(pageable).getContent());
     }
 
     @PutMapping("/{userId}")
@@ -68,10 +72,4 @@ public class UserResource {
         userRepository.deleteById(userId);
         return ResponseEntity.noContent().build();
     }
-
-//    @ResponseBody
-//    @GetMapping(value = "{title}/directors", produces = MediaType.APPLICATION_JSON_VALUE)
-//    ResponseEntity<Set<User>> getDirectors(@PathVariable String title) {
-//        return ResponseEntity.ok(userRepository.findOneByTitle(title).block().getDirectors());
-//    }
 }

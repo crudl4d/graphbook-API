@@ -11,10 +11,10 @@ import java.util.List;
 
 import static org.springframework.data.neo4j.core.schema.Relationship.Direction.OUTGOING;
 
-@Node("Post")
+@Node("Comment")
 @Data
 @AllArgsConstructor
-public class Post {
+public class Comment {
     @Id
     @GeneratedValue
     private Long id;
@@ -23,8 +23,6 @@ public class Post {
     private String content;
     @Property
     private Long likes;
-    @Property
-    private byte[] image;
     @Property
     private User author;
     @Property

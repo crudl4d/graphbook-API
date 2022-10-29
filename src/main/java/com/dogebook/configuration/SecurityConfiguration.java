@@ -51,11 +51,11 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .cors().disable()
                 .authorizeRequests()
-                .antMatchers("/**")
-                .hasAuthority("USER")
-                .antMatchers("/**")
-                .hasAuthority("ADMIN")
                 .antMatchers("/users/register").permitAll()
+                .antMatchers("/**")
+                .hasAnyAuthority("USER", "ADMIN")
+//                .antMatchers("/**")
+//                .hasAuthority("ADMIN")
                 .anyRequest().authenticated();
         return http.build();
     }

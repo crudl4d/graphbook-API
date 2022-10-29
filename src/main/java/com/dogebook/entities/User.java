@@ -2,6 +2,8 @@ package com.dogebook.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.neo4j.core.schema.*;
 import org.springframework.data.neo4j.core.support.DateLong;
@@ -44,6 +46,4 @@ public class User {
 
     @Relationship(type = "IS_FRIENDS_WITH", direction = OUTGOING)
     private Set<User> friends;
-    @Relationship(type = "AUTHORED", direction = OUTGOING)
-    private Set<Post> posts;
 }
