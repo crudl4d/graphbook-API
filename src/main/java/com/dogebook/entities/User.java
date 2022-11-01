@@ -36,6 +36,8 @@ public class User {
     @NotNull
     @DateLong
     private Date birthDate;
+    @Property
+    private String profilePicturePath;
 
     @Relationship(type = "IS_FRIENDS_WITH", direction = OUTGOING)
     private Set<User> friends;
