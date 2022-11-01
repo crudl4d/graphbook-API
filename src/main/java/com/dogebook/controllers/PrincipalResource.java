@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,14 +30,16 @@ public class PrincipalResource {
         return ResponseEntity.ok(userRepository.findById(userContext.getId()).orElseThrow());
     }
 
-    @PostMapping("/profile-picture") public ResponseEntity<Void> uploadImage(@RequestParam("image") MultipartFile image, Principal principal) throws IOException {
+    @PostMapping("/profile-picture")
+    public ResponseEntity<Void> uploadImage(@RequestParam("image") MultipartFile image, Principal principal) throws IOException {
         Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, image.getOriginalFilename());
         Files.write(fileNameAndPath, image.getBytes());
         String fileUrl = userRepository.postProfilePicture(UserContext.getUser(principal).getId(), fileNameAndPath.toString()).getProfilePicturePath();
         return ResponseEntity.ok().header("Location", fileUrl).build();
     }
 
-    @GetMapping(value = "/profile-picture", produces = MediaType.IMAGE_JPEG_VALUE) public ResponseEntity<byte[]> getImage(Principal principal) throws IOException {
+    @GetMapping(value = "/profile-picture", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> getImage(Principal principal) throws IOException {
         User user = userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow();
         Path fileNameAndPath = Paths.get(user.getProfilePicturePath());
         return ResponseEntity.ok(Files.readAllBytes(fileNameAndPath));
