@@ -1,8 +1,10 @@
 package com.dogebook.controllers;
 
 import com.dogebook.configuration.UserContext;
+import com.dogebook.entities.Comment;
 import com.dogebook.entities.Post;
 import com.dogebook.entities.User;
+import com.dogebook.repositories.CommentRepository;
 import com.dogebook.repositories.PostRepository;
 import com.dogebook.repositories.UserRepository;
 import lombok.AllArgsConstructor;
@@ -22,6 +24,8 @@ import java.net.URISyntaxException;
 import java.security.Principal;
 import java.sql.Date;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -31,17 +35,21 @@ public class PostResource {
 
     private PostRepository postRepository;
     private UserRepository userRepository;
+    private CommentRepository commentRepository;
+
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<Post>> getPosts(@RequestParam @NotNull Integer page) {
-        Pageable pageable = PageRequest.of(page, 10);
-        return ResponseEntity.ok(postRepository.findAll(pageable).getContent());
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "created"));
+        List<Post> posts = postRepository.findAll(pageable).getContent();
+        return ResponseEntity.ok(posts);
     }
 
     @PostMapping
     ResponseEntity<Void> createPost(@RequestBody @Valid Post post, Principal principal) throws URISyntaxException {
         post.setAuthor(userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow());
-        post.setCreated(Date.from(Instant.now()));
+        post.setLikes(0L);
+        post.setCreated(LocalDateTime.now());
         Long id = postRepository.save(post).getId();
         return ResponseEntity.created(new URI("/posts/" + id)).build();
     }
@@ -60,6 +68,38 @@ public class PostResource {
             post.setLikes(post.getLikes() == null ? 1L : post.getLikes() + 1);
         }
         postRepository.save(post);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<List<Comment>> getCommentsForPost(@PathVariable Long postId, @RequestParam @NotNull Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return ResponseEntity.ok(postRepository.findById(postId).orElseThrow().getComments());
+    }
+
+    @PostMapping(value = "/{postId}/comments")
+    ResponseEntity<Void> writeComment(@PathVariable Long postId, @RequestBody @Valid Comment comment, Principal principal) throws URISyntaxException {
+        comment.setAuthor(userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow());
+        comment.setCreated(LocalDateTime.now());
+        Long commentId = commentRepository.save(comment).getId();
+        postRepository.addCommentToPost(postId, commentId);
+        return ResponseEntity.created(new URI("/posts/" + postId + "comments/" + commentId)).build();
+    }
+
+    @GetMapping(value = "/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<Comment> getComment(@PathVariable Long commentId) {
+        return ResponseEntity.ok(commentRepository.findById(commentId).orElseThrow());
+    }
+
+    @PostMapping("/{postId}/comments/{commentId}/like")
+    ResponseEntity<Void> likeComment(@PathVariable("commentId") Long commentId, Principal principal) {
+        Comment comment = commentRepository.findById(commentId).orElseThrow();
+        User user = userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow();
+        if (!comment.getLikedBy().contains(user)) {
+            comment.getLikedBy().add(user);
+            comment.setLikes(comment.getLikes() == null ? 1L : comment.getLikes() + 1);
+        }
+        commentRepository.save(comment);
         return ResponseEntity.ok().build();
     }
 }

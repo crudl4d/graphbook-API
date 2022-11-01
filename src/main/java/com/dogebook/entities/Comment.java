@@ -6,6 +6,7 @@ import org.springframework.data.neo4j.core.schema.*;
 import org.springframework.data.neo4j.core.support.DateLong;
 
 import javax.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -26,8 +27,7 @@ public class Comment {
     @Property
     private User author;
     @Property
-    @DateLong
-    private Date created;
+    private LocalDateTime created;
 
     @Relationship(type = "LIKED_BY", direction = OUTGOING)
     private List<User> likedBy;
