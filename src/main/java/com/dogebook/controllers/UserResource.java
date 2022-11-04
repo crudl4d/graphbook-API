@@ -15,8 +15,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.List;
 import java.util.Map;
@@ -71,5 +75,16 @@ public class UserResource {
     ResponseEntity<Void> delete(@PathVariable Long userId) {
         userRepository.deleteById(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping(value = "/{userId}/profile-picture", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> getImage(@PathVariable Long userId) throws IOException {
+        User user = userRepository.findById(userId).orElseThrow();
+        if (user.getProfilePicturePath() == null) {
+            return ResponseEntity.noContent().build();
+        }
+        Path fileNameAndPath = Paths.get(user.getProfilePicturePath().replace(".jpg", "-thumbnail.jpg"));
+        byte[] image = Files.readAllBytes(fileNameAndPath);
+        return ResponseEntity.ok(image);
     }
 }
