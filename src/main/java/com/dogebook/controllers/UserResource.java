@@ -33,6 +33,19 @@ import java.util.Set;
 @RequestMapping("/users")
 public class UserResource {
 
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<List<User>> getUsers(@RequestParam @NotNull Integer page, Principal principal) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return ResponseEntity.ok(userRepository.findAll(pageable).getContent());
+    }
+
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<List<User>> searchUsers(@RequestParam String name) {
+        String regex = ".*"+name+".*";
+        List<User> x = userRepository.findByName(regex);
+        return ResponseEntity.ok(x);
+    }
+
     private UserRepository userRepository;
 
     @PostMapping("/login")
@@ -54,12 +67,6 @@ public class UserResource {
         }
         Long id = userRepository.save(user).getId();
         return ResponseEntity.created(new URI("/users/" + id)).build();
-    }
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<List<User>> getUsers(@RequestParam @NotNull Integer page, Principal principal) {
-        Pageable pageable = PageRequest.of(page, 10);
-        return ResponseEntity.ok(userRepository.findAll(pageable).getContent());
     }
 
     @PutMapping("/{userId}")
