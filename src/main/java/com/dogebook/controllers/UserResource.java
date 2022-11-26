@@ -15,6 +15,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -25,6 +26,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
 @AllArgsConstructor
@@ -34,18 +36,22 @@ public class UserResource {
     private UserRepository userRepository;
 
     @PostMapping("/login")
-    ResponseEntity<Map<?, ?>> login(Principal principal) {
+    ResponseEntity<Map<HttpHeaders, HttpStatus>> login(Principal principal) {
         UserContext userContext = ((UserContext) ((UsernamePasswordAuthenticationToken) principal).getPrincipal());
         HttpHeaders headers = new HttpHeaders();
         headers.add("id", userContext.getId().toString());
         headers.add("name", userContext.getName());
         headers.add("email", userContext.getEmail());
-        return new ResponseEntity(headers, HttpStatus.OK);
+        return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
-    @PostMapping
-    ResponseEntity<Void> registerUser(@RequestBody User user) throws URISyntaxException {
+    @PostMapping("/register")
+    ResponseEntity<Void> registerUser(@RequestBody @Valid User user) throws URISyntaxException {
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        user.setRole(Set.of("ADMIN"));
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException();
+        }
         Long id = userRepository.save(user).getId();
         return ResponseEntity.created(new URI("/users/" + id)).build();
     }

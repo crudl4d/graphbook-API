@@ -2,10 +2,11 @@ package com.dogebook.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.data.neo4j.core.schema.*;
 import org.springframework.data.neo4j.core.support.DateLong;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Set;
 
@@ -19,16 +20,16 @@ public class User {
     @GeneratedValue
     private Long id;
     @Property
-    @NotNull
+    @NotBlank
     private String firstName;
     @Property
-    @NotNull
+    @NotBlank
     private String surname;
     @Property
-    @NotNull
+    @NotBlank
     private String email;
     @Property
-    @NotNull
+    @NotBlank
     private String password;
     @Property
     private Set<String> role;

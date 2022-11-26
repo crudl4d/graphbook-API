@@ -51,7 +51,7 @@ public class SecurityConfiguration {
                 .csrf().disable()
                 .cors().disable()
                 .authorizeRequests()
-                .antMatchers("/users/register").permitAll()
+                .antMatchers("/users/register", "/users/login").permitAll()
                 .antMatchers("/**")
                 .hasAnyAuthority("USER", "ADMIN")
 //                .antMatchers("/**")
