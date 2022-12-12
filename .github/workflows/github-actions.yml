@@ -25,7 +25,7 @@ jobs:
           port: 22
           source: "my-app.jar"
           target: "~/source"
-        script: |
+        run: |
           sudo /etc/init.d/my-app stop
           mv ~/source/my-app.jar ~/source/my-app-old.jar
           mv ~/source/my-app-latest.jar ~/source/my-app.jar
