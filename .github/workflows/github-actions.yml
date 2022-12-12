@@ -16,9 +16,6 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
-      - name: check
-        run: ls -R ~
-
       - name: Upload application
         uses: appleboy/scp-action@master
         with:
@@ -26,7 +23,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          source: "dogebook-1.0.jar"
+          source: ".target/dogebook-1.0.jar"
           target: "~/source"
       - name: Start Service
         uses: appleboy/ssh-action@master
