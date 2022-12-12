@@ -43,13 +43,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          script: |
-            fuser -k 8080/tcp
-            rm ~/app/dogebook.jar
-            mv ~/app/target/dogebook-1.0.jar ~/app/dogebook.jar
-            java -jar ~/app/dogebook.jar &
-            disown -a
-            rm ~/app/target/dogebook.jar
-          
-
-          #sh /home/super/app/script.sh & disown -a ; ~.
+          script: nohup sh /home/super/app/script.sh > nohup.out 2> nohup.err < /dev/null &
