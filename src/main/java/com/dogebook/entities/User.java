@@ -1,6 +1,7 @@
 package com.dogebook.entities;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.springframework.data.neo4j.core.schema.*;
 import org.springframework.data.neo4j.core.support.DateLong;
@@ -8,6 +9,7 @@ import org.springframework.data.neo4j.core.support.DateLong;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import static org.springframework.data.neo4j.core.schema.Relationship.Direction.OUTGOING;
@@ -15,6 +17,7 @@ import static org.springframework.data.neo4j.core.schema.Relationship.Direction.
 @Node("User")
 @Data
 @AllArgsConstructor
+@Builder
 public class User {
     @Id
     @GeneratedValue
@@ -41,5 +44,5 @@ public class User {
     private String profilePicturePath;
 
     @Relationship(type = "IS_FRIENDS_WITH", direction = OUTGOING)
-    private Set<User> friends;
+    private List<Friend> friends;
 }

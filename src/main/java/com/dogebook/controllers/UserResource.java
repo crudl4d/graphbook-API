@@ -2,6 +2,7 @@ package com.dogebook.controllers;
 
 import com.dogebook.configuration.UserContext;
 import com.dogebook.entities.User;
+import com.dogebook.entities.UserPatch;
 import com.dogebook.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
@@ -55,6 +56,7 @@ public class UserResource {
         headers.add("id", userContext.getId().toString());
         headers.add("name", userContext.getName());
         headers.add("email", userContext.getEmail());
+        headers.add("role", userContext.getAuthorities().toArray()[0].toString());
         return new ResponseEntity<>(headers, HttpStatus.OK);
     }
 
@@ -91,13 +93,16 @@ public class UserResource {
     }
 
     @GetMapping(value = "/{userId}/profile-picture", produces = MediaType.IMAGE_JPEG_VALUE)
-    public ResponseEntity<byte[]> getImage(@PathVariable Long userId) throws IOException {
+    public ResponseEntity<byte[]> getImage(@PathVariable Long userId, @RequestParam(defaultValue = "true") boolean isThumbnail) throws IOException {
         User user = userRepository.findById(userId).orElseThrow();
         if (user.getProfilePicturePath() == null) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.notFound().build();
         }
-        Path fileNameAndPath = Paths.get(user.getProfilePicturePath().replace(".jpg", "-thumbnail.jpg"));
-        byte[] image = Files.readAllBytes(fileNameAndPath);
+        String fileNameAndPath = user.getProfilePicturePath();
+        if (isThumbnail) {
+            fileNameAndPath = fileNameAndPath.replace(".jpg", "-thumbnail.jpg");
+        }
+        byte[] image = Files.readAllBytes(Paths.get(fileNameAndPath));
         return ResponseEntity.ok(image);
     }
 }

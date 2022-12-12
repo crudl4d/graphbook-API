@@ -20,4 +20,7 @@ public interface UserRepository extends Neo4jRepository<User, Long> {
 
     @Query("MATCH (u:User) WHERE u.firstName+' '+u.surname=~$regex return u")
     List<User> findByName(String regex);
+
+    @Query("MATCH (u:User), (u1:User) WHERE id(u)=$invitedUserId and id(u1)=$invitingUserId CREATE (u)-[:IS_FRIENDS_WITH { accepted: false }]->(u1)")
+    void addFriend(Long invitedUserId, Long invitingUserId);
 }

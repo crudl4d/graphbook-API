@@ -3,6 +3,7 @@ package com.dogebook.controllers;
 import com.dogebook.PrincipalService;
 import com.dogebook.configuration.UserContext;
 import com.dogebook.entities.User;
+import com.dogebook.entities.UserPatch;
 import com.dogebook.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +38,9 @@ public class PrincipalResource {
     }
 
     @PatchMapping
-    ResponseEntity<Void> editUser(Principal principal, @RequestBody @Valid User user) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+    ResponseEntity<Void> editUser(Principal principal, @RequestBody @Valid UserPatch user) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         User oldUser = userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow();
-        userRepository.save(principalService.patchUser(oldUser, user));
+        userRepository.save(principalService.patchUser(oldUser, user.toUser()));
         return ResponseEntity.noContent().build();
     }
 
