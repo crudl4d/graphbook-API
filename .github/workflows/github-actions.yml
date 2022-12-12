@@ -43,5 +43,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          script: sh /home/super/app/script.sh
-          #
+          script: sh /home/super/app/script.sh &
