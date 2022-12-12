@@ -16,9 +16,6 @@ jobs:
       - name: Build with Maven
         run: mvn clean install
 
-      - name: check
-        run: ls -R ./target/
-
       - name: Upload application
         uses: appleboy/scp-action@master
         with:
@@ -27,7 +24,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           source: "./target/dogebook-1.0.jar"
-          target: "~/source"
+          target: "~/app"
       - name: Start Service
         uses: appleboy/ssh-action@master
         with:
@@ -36,10 +33,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
-            sudo /etc/init.d/my-app stop
-            mv ~/source/my-app.jar ~/source/my-app-old.jar
-            mv ~/source/my-app-latest.jar ~/source/my-app.jar
-            sudo rm -rf /etc/init.d/my-app
-            sudo ln -s -f ~/source/my-app.jar /etc/init.d/my-app
-            sudo /etc/init.d/my-app start
-            rm ~/source/my-app-old.jar
+            fuser -k 8080/tcp
+            mv ~/app/dogebook-1.0.jar ~/app/old/old-dogebook.jar
+            mv ~/app/target/dogebook.jar ~/app/dogebook.jar
+            java -jar ~/app/dogebook.jar
+            rm ~/app/target/dogebook.jar
