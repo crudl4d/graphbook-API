@@ -3,7 +3,9 @@ run-name: ${{ github.actor }} PwCO app 🚀
 on: [push]
 jobs:
   test:
-    run: mvn test
+    runs-on: ubuntu-latest
+    steps:
+      run: mvn test
 
 #  build:
 #    runs-on: ubuntu-latest
