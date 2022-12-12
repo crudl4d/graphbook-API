@@ -25,11 +25,11 @@ jobs:
           port: 22
           source: "my-app.jar"
           target: "~/source"
-        run: |
-          sudo /etc/init.d/my-app stop
-          mv ~/source/my-app.jar ~/source/my-app-old.jar
-          mv ~/source/my-app-latest.jar ~/source/my-app.jar
-          sudo rm -rf /etc/init.d/my-app
-          sudo ln -s -f ~/source/my-app.jar /etc/init.d/my-app
-          sudo /etc/init.d/my-app start
-          rm ~/source/my-app-old.jar
+          script: |
+            sudo /etc/init.d/my-app stop
+            mv ~/source/my-app.jar ~/source/my-app-old.jar
+            mv ~/source/my-app-latest.jar ~/source/my-app.jar
+            sudo rm -rf /etc/init.d/my-app
+            sudo ln -s -f ~/source/my-app.jar /etc/init.d/my-app
+            sudo /etc/init.d/my-app start
+            rm ~/source/my-app-old.jar
