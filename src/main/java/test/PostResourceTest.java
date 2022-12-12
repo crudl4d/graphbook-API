@@ -1,5 +1,6 @@
-package com.dogebook.controllers;
+package test;
 
+import com.dogebook.controllers.PostResource;
 import com.dogebook.entities.Comment;
 import com.dogebook.entities.Post;
 import com.dogebook.repositories.PostRepository;
@@ -8,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 

@@ -34,14 +34,14 @@ public class PostResource {
 
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<List<Post>> getPosts(@RequestParam @NotNull Integer page) {
+    public ResponseEntity<List<Post>> getPosts(@RequestParam @NotNull Integer page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "created"));
         List<Post> posts = postRepository.findAll(pageable).getContent();
         return ResponseEntity.ok(posts);
     }
 
     @PostMapping
-    ResponseEntity<Void> createPost(@RequestBody @Valid Post post, Principal principal) throws URISyntaxException {
+    public ResponseEntity<Void> createPost(@RequestBody @Valid Post post, Principal principal) throws URISyntaxException {
         post.setAuthor(userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow());
         post.setLikes(0L);
         post.setCreated(LocalDateTime.now());
@@ -50,12 +50,12 @@ public class PostResource {
     }
 
     @GetMapping(value = "/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Post> getPost(@PathVariable Long postId) {
+    public ResponseEntity<Post> getPost(@PathVariable Long postId) {
         return ResponseEntity.ok(postRepository.findById(postId).orElseThrow());
     }
 
     @PostMapping("/{postId}/like")
-    ResponseEntity<Void> likePost(@PathVariable("postId") Long postId, Principal principal) {
+    public ResponseEntity<Void> likePost(@PathVariable("postId") Long postId, Principal principal) {
         Post post = postRepository.findById(postId).orElseThrow();
         User user = userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow();
         if (!post.getLikedBy().contains(user)) {
@@ -67,13 +67,13 @@ public class PostResource {
     }
 
     @GetMapping(value = "/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<List<Comment>> getCommentsForPost(@PathVariable Long postId, @RequestParam @NotNull Integer page) {
+    public ResponseEntity<List<Comment>> getCommentsForPost(@PathVariable Long postId, @RequestParam @NotNull Integer page) {
         Pageable pageable = PageRequest.of(page, 10);
         return ResponseEntity.ok(postRepository.findById(postId).orElseThrow().getComments());
     }
 
     @PostMapping(value = "/{postId}/comments")
-    ResponseEntity<Void> writeComment(@PathVariable Long postId, @RequestBody @Valid Comment comment, Principal principal) throws URISyntaxException {
+    public ResponseEntity<Void> writeComment(@PathVariable Long postId, @RequestBody @Valid Comment comment, Principal principal) throws URISyntaxException {
         comment.setAuthor(userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow());
         comment.setCreated(LocalDateTime.now());
         Long commentId = commentRepository.save(comment).getId();
@@ -82,12 +82,12 @@ public class PostResource {
     }
 
     @GetMapping(value = "/{postId}/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<Comment> getComment(@PathVariable Long commentId) {
+    public ResponseEntity<Comment> getComment(@PathVariable Long commentId) {
         return ResponseEntity.ok(commentRepository.findById(commentId).orElseThrow());
     }
 
     @PostMapping("/{postId}/comments/{commentId}/like")
-    ResponseEntity<Void> likeComment(@PathVariable("commentId") Long commentId, Principal principal) {
+    public ResponseEntity<Void> likeComment(@PathVariable("commentId") Long commentId, Principal principal) {
         Comment comment = commentRepository.findById(commentId).orElseThrow();
         User user = userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow();
         if (!comment.getLikedBy().contains(user)) {
