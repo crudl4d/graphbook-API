@@ -32,9 +32,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          script: |
-            fuser -k 8080/tcp
-            mv ~/app/dogebook-1.0.jar ~/app/old/old-dogebook.jar
-            mv ~/app/target/dogebook.jar ~/app/dogebook.jar
-            java -jar ~/app/dogebook.jar
-            rm ~/app/target/dogebook.jar
+          script: sh /home/super/app/script.sh
