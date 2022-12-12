@@ -17,7 +17,7 @@ jobs:
         run: mvn --batch-mode --update-snapshots package
 
       - name: Upload application
-        uses: appleboy/ssh-action@master
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.VM_PUBLIC_IP }}
           username: ${{ secrets.USERNAME }}
@@ -25,6 +25,13 @@ jobs:
           port: 22
           source: "my-app.jar"
           target: "~/source"
+      - name: Start Service
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.API_IP_ADDRESS }}
+          username: ${{ secrets.API_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          port: 22
           script: |
             sudo /etc/init.d/my-app stop
             mv ~/source/my-app.jar ~/source/my-app-old.jar
