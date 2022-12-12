@@ -28,9 +28,9 @@ jobs:
       - name: Start Service
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.API_IP_ADDRESS }}
-          username: ${{ secrets.API_USERNAME }}
-          key: ${{ secrets.AWS_SSH_KEY }}
+          host: ${{ secrets.VM_PUBLIC_IP }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
           port: 22
           script: |
             sudo /etc/init.d/my-app stop
