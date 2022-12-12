@@ -5,7 +5,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      run: mvn test
+      - run: mvn test
 
 #  build:
 #    runs-on: ubuntu-latest
