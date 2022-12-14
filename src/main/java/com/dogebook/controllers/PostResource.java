@@ -54,6 +54,12 @@ public class PostResource {
         return ResponseEntity.ok(postRepository.findById(postId).orElseThrow());
     }
 
+    @DeleteMapping(value = "/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
+        postRepository.deleteById(postId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{postId}/like")
     public ResponseEntity<Void> likePost(@PathVariable("postId") Long postId, Principal principal) {
         Post post = postRepository.findById(postId).orElseThrow();

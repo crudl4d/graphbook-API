@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 
+import java.util.List;
+
 public interface PostRepository extends Neo4jRepository<Post, Long> {
     @NotNull
 //    @Query(value = "MATCH (n:Post) where n.created is not null RETURN n order by n.created desc LIMIT 25", countQuery = "MATCH (n:Post) RETURN count(n)")
@@ -20,4 +22,7 @@ public interface PostRepository extends Neo4jRepository<Post, Long> {
             CREATE (p)-[r:COMMENT_ON_POST]->(c)
             """)
     void addCommentToPost(Long postId, Long commentId);
+
+    @Query("MATCH (p:Post)-[AUTHOR]->(u:User) WHERE id(u)=$userId return p")
+    List<Post> findPosts(Long userId);
 }
