@@ -6,10 +6,10 @@ spring:
       password: password
   # Default values for local database connection, can be overridden by environment variables
   neo4j:
+    uri: ${DB_URI} #bolt://localhost:7687
     authentication:
       username: ${DB_USERNAME:neo4j}
       password: ${DB_PASSWORD:password}
-    uri: ${DB_URI} #bolt://localhost:7687
 
 logging:
   level:
