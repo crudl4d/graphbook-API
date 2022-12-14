@@ -36,9 +36,6 @@ public class UserResource {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<User>> getUsers(@RequestParam @NotNull Integer page, Principal principal) {
-        System.out.println(System.getProperty("DB_PASSWORD"));
-        System.out.println(System.getProperty("DB_URI"));
-        System.out.println(System.getProperty("DB_USERNAME"));
         Pageable pageable = PageRequest.of(page, 10);
         return ResponseEntity.ok(userRepository.findAll(pageable).getContent());
     }
