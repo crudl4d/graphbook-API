@@ -8,8 +8,8 @@ spring:
   neo4j:
     uri: neo4j+s://426356fe.databases.neo4j.io #bolt://localhost:7687
     authentication:
-      username: neo4j
-      password: N34gbIyF0WxKbpDouue0xUKKosMgozF1Pu_9MXiRGH8
+      username: ${DB_USERNAME:neo4j}
+      password: ${DB_PASSWORD:password}
 
 logging:
   level:
