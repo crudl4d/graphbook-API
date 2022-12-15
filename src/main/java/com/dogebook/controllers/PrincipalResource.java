@@ -2,8 +2,10 @@ package com.dogebook.controllers;
 
 import com.dogebook.PrincipalService;
 import com.dogebook.configuration.UserContext;
+import com.dogebook.entities.Post;
 import com.dogebook.entities.User;
 import com.dogebook.entities.UserPatch;
+import com.dogebook.repositories.PostRepository;
 import com.dogebook.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
+import java.util.List;
 
 @AllArgsConstructor
 @RestController
@@ -27,6 +30,7 @@ import java.security.Principal;
 public class PrincipalResource {
 
     private UserRepository userRepository;
+    private PostRepository postRepository;
 
     @Autowired
     private PrincipalService principalService;
@@ -54,5 +58,10 @@ public class PrincipalResource {
         User user = userRepository.findById(UserContext.getUser(principal).getId()).orElseThrow();
         Path fileNameAndPath = Paths.get(user.getProfilePicturePath());
         return ResponseEntity.ok(Files.readAllBytes(fileNameAndPath));
+    }
+
+    @GetMapping(value = "posts", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Post>> getPosts(Principal principal) {
+        return ResponseEntity.ok(postRepository.findPosts(UserContext.getUser(principal).getId()));
     }
 }
