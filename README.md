@@ -1,10 +1,7 @@
-
+<a name="readme-top"></a>
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
 
 <h3 align="center">Dogebook API</h3>
 
@@ -42,8 +39,6 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
 
 This is an API for a social service called Dogebook.
 
@@ -86,14 +81,17 @@ You need to install java 17 and Maven
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Following endpoints are currently available:
 
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
+   ```sh
+   /users GET
+   /users/search GET
+   /users/login POST
+   /users/register POST
+   /users/{userId} GET
+   /users/{userId} PATCH
+   /users/{userId}/profile-picture GET
+   ```
 
 <!-- LICENSE -->
 ## License
