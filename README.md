@@ -65,11 +65,11 @@ This is an API for a social service called Dogebook.
 You need to install java 17 and Maven
 ### Installation
 
-1Clone the repo
+1 Clone the repo
    ```sh
    git clone https://github.com/crudl4d/dogebook-API.git
    ```
-2Install the project, either with maven or IDE
+2 Install the project, either with maven or IDE
    ```sh
    mvn clean install
    ```
