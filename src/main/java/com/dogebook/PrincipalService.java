@@ -26,38 +26,44 @@ import java.security.Principal;
 @Service
 public class PrincipalService {
 
+	@Autowired
+	private UserRepository userRepository;
+	public static final String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
 
-    @Autowired
-    private UserRepository userRepository;
-    public static final String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
-
-    public String createFile(MultipartFile image, Principal principal) throws IOException {
-        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + ".jpg");
+	public String createFile(MultipartFile image, Principal principal) throws IOException {
+		Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + ".jpg");
 		try {
 			Files.createFile(fileNameAndPath);
-		} catch (NoSuchFileException ignored) {}
-        Files.write(fileNameAndPath, image.getBytes());
-        String fileUrl = userRepository.postProfilePicture(UserContext.getUser(principal).getId(), fileNameAndPath.toString()).getProfilePicturePath();
+		}
+		catch (NoSuchFileException ignored) {
+		}
+		finally {
+			return createFileInternal(principal, fileNameAndPath, image);
+		}
+	}
 
-        BufferedImage resizedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(ImageIO.read(new ByteArrayInputStream(image.getBytes())), 0, 0, 100, 100, null);
-        graphics2D.dispose();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, "jpg", baos);
-        byte[] bytes = baos.toByteArray();
-        Files.write(Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"), bytes);
-        return fileUrl;
-    }
+	private String createFileInternal(Principal principal, Path fileNameAndPath, MultipartFile image) throws IOException {
+		Files.write(fileNameAndPath, image.getBytes());
+		String fileUrl = userRepository.postProfilePicture(UserContext.getUser(principal).getId(), fileNameAndPath.toString()).getProfilePicturePath();
+		BufferedImage resizedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+		Graphics2D graphics2D = resizedImage.createGraphics();
+		graphics2D.drawImage(ImageIO.read(new ByteArrayInputStream(image.getBytes())), 0, 0, 100, 100, null);
+		graphics2D.dispose();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(resizedImage, "jpg", baos);
+		byte[] bytes = baos.toByteArray();
+		Files.write(Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"), bytes);
+		return fileUrl;
+	}
 
-    public User patchUser(User existingUser, User toPatch) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Field[] fields = User.class.getDeclaredFields();
-        for (Field field : fields) {
-            Object value = User.class.getMethod("get" + StringUtils.capitalize(field.getName())).invoke(toPatch);
-            if (value != null) {
-                User.class.getMethod("set" + StringUtils.capitalize(field.getName()), field.getType()).invoke(existingUser, value);
-            }
-        }
-        return existingUser;
-    }
+	public User patchUser(User existingUser, User toPatch) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		Field[] fields = User.class.getDeclaredFields();
+		for (Field field : fields) {
+			Object value = User.class.getMethod("get" + StringUtils.capitalize(field.getName())).invoke(toPatch);
+			if (value != null) {
+				User.class.getMethod("set" + StringUtils.capitalize(field.getName()), field.getType()).invoke(existingUser, value);
+			}
+		}
+		return existingUser;
+	}
 }
