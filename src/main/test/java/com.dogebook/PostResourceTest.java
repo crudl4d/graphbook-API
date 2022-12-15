@@ -31,7 +31,7 @@ class PostResourceTest {
     public void beforeAll() {
         postRepository = mock(PostRepository.class);
         var comment = new Comment(1L, "content", 10L, null, null, null);
-        Post post = new Post(0L, "content", 5L, null, null, null, null, List.of(comment));
+        var post = new Post(0L, "content", 5L, null, null, null, null, List.of(comment));
         Mockito.when(postRepository.findById(0L)).thenReturn(Optional.of(post));
         Mockito.when(postRepository.findAll()).thenReturn(List.of(post));
         Mockito.when(postRepository.count()).thenReturn(1L);
@@ -39,11 +39,11 @@ class PostResourceTest {
 
     @Test
     void getPost() {
-        assertEquals(postResource.getPost(0L).getBody().getLikes(), 5L);
+        assertEquals(5L, postResource.getPost(0L).getBody().getLikes());
     }
 
     @Test
     void getCommentsForPost() {
-        assertEquals(postResource.getPost(0L).getBody().getComments().get(0).getLikes(), 10L);
+        assertEquals(10L, postResource.getPost(0L).getBody().getComments().get(0).getLikes());
     }
 }
