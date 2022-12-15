@@ -93,7 +93,7 @@ Following endpoints are currently available:
    /users/{userId}/profile-picture GET
    ```
 
-<!-- LICENSE -->
+<!-- LICENSE  -->
 ## License
 
 Distributed under the MIT License. See `LICENSE.txt` for more information.
