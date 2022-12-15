@@ -33,9 +33,9 @@ public class PrincipalService {
 
 	public String createFile(MultipartFile image, Principal principal) throws IOException {
 		Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + ".jpg");
-		if (Files.exists(fileNameAndPath)) {
+		if (!Files.exists(fileNameAndPath)) {
 			Files.createFile(fileNameAndPath);
-
+			Files.createFile(Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"));
 		}
 		return createFileInternal(principal, fileNameAndPath, image);
 	}
