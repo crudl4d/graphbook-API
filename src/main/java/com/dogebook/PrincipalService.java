@@ -35,7 +35,7 @@ public class PrincipalService {
 		Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + ".jpg");
 		if (!Files.exists(fileNameAndPath)) {
 			Files.createFile(fileNameAndPath);
-			Files.createFile(Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"));
+			Files.createFile(Path.of(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"));
 		}
 		return createFileInternal(principal, fileNameAndPath, image);
 	}
@@ -50,7 +50,7 @@ public class PrincipalService {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ImageIO.write(resizedImage, "jpg", baos);
 		byte[] bytes = baos.toByteArray();
-		Files.write(Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"), bytes);
+		Files.write(Path.of(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"), bytes);
 		return fileUrl;
 	}
 
