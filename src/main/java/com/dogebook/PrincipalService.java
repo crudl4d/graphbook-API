@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -32,14 +33,11 @@ public class PrincipalService {
 
 	public String createFile(MultipartFile image, Principal principal) throws IOException {
 		Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + ".jpg");
-		try {
+		if (Files.exists(fileNameAndPath)) {
 			Files.createFile(fileNameAndPath);
+
 		}
-		catch (NoSuchFileException ignored) {
-		}
-		finally {
-			return createFileInternal(principal, fileNameAndPath, image);
-		}
+		return createFileInternal(principal, fileNameAndPath, image);
 	}
 
 	private String createFileInternal(Principal principal, Path fileNameAndPath, MultipartFile image) throws IOException {
