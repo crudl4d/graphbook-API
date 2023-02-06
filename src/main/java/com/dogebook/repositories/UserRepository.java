@@ -36,4 +36,7 @@ public interface UserRepository extends Neo4jRepository<User, Long> {
 
     @Query("MATCH (u1)-[f:IS_FRIENDS_WITH {accepted: true}]-(u) WHERE id(u)=$userId RETURN u1")
     List<User> getFriends(Long userId);
+
+    @Query("MATCH (u1)-[f:IS_FRIENDS_WITH {accepted: true}]-(u) WHERE id(u)=$userId and id(u1)=$userToUnfriendId delete f")
+    void unfriend(Long userId, Long userToUnfriendId);
 }

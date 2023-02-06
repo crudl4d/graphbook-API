@@ -35,13 +35,25 @@ public class FriendResource {
 
     @GetMapping
     ResponseEntity<List<User>> getFriends(Principal principal) {
-        List<User> friends = userRepository.getFriends(UserContext.getUser(principal).getId());
+        List<User> friends = userRepository.getFriends(UserContext.getUser(principal).getId()).stream().distinct().toList();
         return ResponseEntity.ok(friends);
+    }
+
+    @DeleteMapping("/{userToUnfriendId}")
+    ResponseEntity<List<User>> unfriend(Principal principal, @PathVariable("userToUnfriendId") Long userToUnfriendId) {
+        userRepository.unfriend(UserContext.getUser(principal).getId(), userToUnfriendId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/requests-sent")
     ResponseEntity<List<User>> getSentRequests(Principal principal) {
         List<User> friends = userRepository.getSentFriendRequests(UserContext.getUser(principal).getId());
+        return ResponseEntity.ok(friends);
+    }
+
+    @GetMapping("/requests-received")
+    ResponseEntity<List<User>> getReceivedRequests(Principal principal) {
+        List<User> friends = userRepository.getReceivedFriendRequests(UserContext.getUser(principal).getId());
         return ResponseEntity.ok(friends);
     }
 
