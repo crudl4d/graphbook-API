@@ -25,7 +25,6 @@ import java.security.Principal;
 @Service
 public class PrincipalService {
 
-
     @Autowired
     private UserRepository userRepository;
     public static final String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
@@ -33,18 +32,20 @@ public class PrincipalService {
     public String createFile(MultipartFile image, Principal principal) throws IOException {
         Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + ".jpg");
         Files.write(fileNameAndPath, image.getBytes());
-        String fileUrl = userRepository.postProfilePicture(UserContext.getUser(principal).getId(), fileNameAndPath.toString()).getProfilePicturePath();
+        createThumbnail(image, principal);
+        return userRepository.postProfilePicture(UserContext.getUser(principal).getId(), fileNameAndPath.toString()).getProfilePicturePath();
+    }
 
+    private static void createThumbnail(MultipartFile image, Principal principal) throws IOException {
         BufferedImage resizedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = resizedImage.createGraphics();
         graphics2D.drawImage(ImageIO.read(new ByteArrayInputStream(image.getBytes())), 0, 0, 100, 100, null);
         graphics2D.dispose();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(resizedImage, "jpg", baos);
-        byte[] bytes = baos.toByteArray();
-        Files.write(Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"), bytes);
-        return fileUrl;
+        Files.write(Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"), baos.toByteArray());
     }
+
 
     public User patchUser(User existingUser, User toPatch) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
         Field[] fields = User.class.getDeclaredFields();

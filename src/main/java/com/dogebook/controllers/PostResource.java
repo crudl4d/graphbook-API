@@ -73,8 +73,7 @@ public class PostResource {
     }
 
     @GetMapping(value = "/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Comment>> getCommentsForPost(@PathVariable Long postId, @RequestParam @NotNull Integer page) {
-        Pageable pageable = PageRequest.of(page, 10);
+    public ResponseEntity<List<Comment>> getCommentsForPost(@PathVariable Long postId) {
         return ResponseEntity.ok(postRepository.findById(postId).orElseThrow().getComments());
     }
 
