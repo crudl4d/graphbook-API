@@ -26,6 +26,6 @@ public interface PostRepository extends Neo4jRepository<Post, Long> {
     @Query("MATCH (p:Post)-[AUTHOR]->(u:User) WHERE id(u)=$userId return p")
     List<Post> findPosts(Long userId);
 
-    @Query(value = "MATCH (u1)-[f:IS_FRIENDS_WITH]-(u), (p:Post)-[AUTHOR]->(u1) WHERE id(u)=$userId RETURN p")
+    @Query(value = "MATCH (u1)-[f:IS_FRIENDS_WITH {accepted: true}]-(u), (p:Post)-[AUTHOR]->(u1) WHERE id(u)=$userId RETURN p")
     List<Post> findFriendsPosts(Long userId);
 }
