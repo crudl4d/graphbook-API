@@ -37,6 +37,7 @@ public class PostResource {
     public ResponseEntity<List<Post>> getPosts(@RequestParam @NotNull Integer page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "created"));
         List<Post> posts = postRepository.findAll(pageable).getContent();
+        posts = posts.stream().filter(post -> Post.Visibility.PUBLIC.toString().equals(post.getVisibility())).toList();
         return ResponseEntity.ok(posts);
     }
 
