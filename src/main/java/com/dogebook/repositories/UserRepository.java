@@ -19,7 +19,7 @@ public interface UserRepository extends Neo4jRepository<User, Long> {
     @Query("MATCH (u:User) WHERE id(u)=$userId SET u.profilePicturePath=$profilePicturePath RETURN u")
     User postProfilePicture(Long userId, String profilePicturePath);
 
-    @Query("MATCH (u:User) WHERE u.firstName+' '+u.surname=~$regex return u")
+    @Query("MATCH (u:User) WHERE toLower(u.firstName)+' '+toLower(u.surname)=~$regex return u")
     List<User> findByName(String regex);
 
     @Query("MATCH (u:User), (u1:User) WHERE id(u)=$invitedUserId and id(u1)=$invitingUserId CREATE (u1)-[:IS_FRIENDS_WITH { accepted: false }]->(u)")

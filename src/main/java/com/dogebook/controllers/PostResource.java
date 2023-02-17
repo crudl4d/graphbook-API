@@ -53,6 +53,8 @@ public class PostResource {
     @GetMapping(value = "/friends", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Post>> getFriendsPosts(Principal principal) {
         List<Post> posts = postRepository.findFriendsPosts(UserContext.getUser(principal).getId());
+        postRepository.findPostAuthor(posts.get(0).getId());
+        posts.forEach(post -> post.setAuthor(userRepository.findById(postRepository.findPostAuthor(post.getId())).orElseThrow()));
         return ResponseEntity.ok(posts);
     }
 

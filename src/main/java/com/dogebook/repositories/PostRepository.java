@@ -1,6 +1,7 @@
 package com.dogebook.repositories;
 
 import com.dogebook.entities.Post;
+import com.dogebook.entities.User;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,4 +29,7 @@ public interface PostRepository extends Neo4jRepository<Post, Long> {
 
     @Query(value = "MATCH (u1)-[f:IS_FRIENDS_WITH {accepted: true}]-(u), (p:Post)-[AUTHOR]->(u1) WHERE id(u)=$userId RETURN p")
     List<Post> findFriendsPosts(Long userId);
+
+    @Query("MATCH (p:Post)-[:AUTHOR]-(u:User) WHERE id(p)=$postId return id(u)")
+    Long findPostAuthor(Long postId);
 }
