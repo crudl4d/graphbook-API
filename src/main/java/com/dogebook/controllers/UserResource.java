@@ -42,7 +42,7 @@ public class UserResource {
 
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<User>> searchUsers(@RequestParam String name) {
-        String regex = ".*"+name.toLowerCase()+".*";
+        String regex = ".*"+name+".*";
         List<User> x = userRepository.findByName(regex);
         return ResponseEntity.ok(x);
     }

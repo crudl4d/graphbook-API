@@ -14,10 +14,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.Principal;
@@ -25,36 +27,41 @@ import java.security.Principal;
 @Service
 public class PrincipalService {
 
-    @Autowired
-    private UserRepository userRepository;
-    public static final String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
+	@Autowired
+	private UserRepository userRepository;
+	public static final String UPLOAD_DIRECTORY = System.getProperty("user.dir") + "/uploads";
 
-    public String createFile(MultipartFile image, Principal principal) throws IOException {
-        Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + ".jpg");
-        Files.write(fileNameAndPath, image.getBytes());
-        createThumbnail(image, principal);
-        return userRepository.postProfilePicture(UserContext.getUser(principal).getId(), fileNameAndPath.toString()).getProfilePicturePath();
-    }
+	public String createFile(MultipartFile image, Principal principal) throws IOException {
+		Path fileNameAndPath = Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + ".jpg");
+		if (!Files.exists(fileNameAndPath)) {
+			Files.createFile(fileNameAndPath);
+			Files.createFile(Path.of(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"));
+		}
+		return createFileInternal(principal, fileNameAndPath, image);
+	}
 
-    private static void createThumbnail(MultipartFile image, Principal principal) throws IOException {
-        BufferedImage resizedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(ImageIO.read(new ByteArrayInputStream(image.getBytes())), 0, 0, 100, 100, null);
-        graphics2D.dispose();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(resizedImage, "jpg", baos);
-        Files.write(Paths.get(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"), baos.toByteArray());
-    }
+	private String createFileInternal(Principal principal, Path fileNameAndPath, MultipartFile image) throws IOException {
+		Files.write(fileNameAndPath, image.getBytes());
+		String fileUrl = userRepository.postProfilePicture(UserContext.getUser(principal).getId(), fileNameAndPath.toString()).getProfilePicturePath();
+		BufferedImage resizedImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB);
+		Graphics2D graphics2D = resizedImage.createGraphics();
+		graphics2D.drawImage(ImageIO.read(new ByteArrayInputStream(image.getBytes())), 0, 0, 100, 100, null);
+		graphics2D.dispose();
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		ImageIO.write(resizedImage, "jpg", baos);
+		byte[] bytes = baos.toByteArray();
+		Files.write(Path.of(UPLOAD_DIRECTORY, UserContext.getUser(principal).getId().toString() + "-thumbnail.jpg"), bytes);
+		return fileUrl;
+	}
 
-
-    public User patchUser(User existingUser, User toPatch) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
-        Field[] fields = User.class.getDeclaredFields();
-        for (Field field : fields) {
-            Object value = User.class.getMethod("get" + StringUtils.capitalize(field.getName())).invoke(toPatch);
-            if (value != null) {
-                User.class.getMethod("set" + StringUtils.capitalize(field.getName()), field.getType()).invoke(existingUser, value);
-            }
-        }
-        return existingUser;
-    }
+	public User patchUser(User existingUser, User toPatch) throws IllegalAccessException, NoSuchMethodException, InvocationTargetException {
+		Field[] fields = User.class.getDeclaredFields();
+		for (Field field : fields) {
+			Object value = User.class.getMethod("get" + StringUtils.capitalize(field.getName())).invoke(toPatch);
+			if (value != null) {
+				User.class.getMethod("set" + StringUtils.capitalize(field.getName()), field.getType()).invoke(existingUser, value);
+			}
+		}
+		return existingUser;
+	}
 }

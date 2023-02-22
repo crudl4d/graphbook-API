@@ -37,7 +37,6 @@ public class PostResource {
     public ResponseEntity<List<Post>> getPosts(@RequestParam @NotNull Integer page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "created"));
         List<Post> posts = postRepository.findAll(pageable).getContent();
-        posts = posts.stream().filter(post -> Post.Visibility.PUBLIC.toString().equals(post.getVisibility())).toList();
         return ResponseEntity.ok(posts);
     }
 
@@ -51,9 +50,9 @@ public class PostResource {
     }
 
     @GetMapping(value = "/friends", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Post>> getFriendsPosts(Principal principal) {
-        List<Post> posts = postRepository.findFriendsPosts(UserContext.getUser(principal).getId());
-        postRepository.findPostAuthor(posts.get(0).getId());
+    public ResponseEntity<List<Post>> getFriendsPosts(@RequestParam @NotNull Integer page, Principal principal) {
+        Pageable pageable = PageRequest.of(page, 10);
+        List<Post> posts = postRepository.findFriendsPostsPaginated(UserContext.getUser(principal).getId(), pageable).getContent();
         posts.forEach(post -> post.setAuthor(userRepository.findById(postRepository.findPostAuthor(post.getId())).orElseThrow()));
         return ResponseEntity.ok(posts);
     }
@@ -82,7 +81,8 @@ public class PostResource {
     }
 
     @GetMapping(value = "/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Comment>> getCommentsForPost(@PathVariable Long postId) {
+    public ResponseEntity<List<Comment>> getCommentsForPost(@PathVariable Long postId, @RequestParam @NotNull Integer page) {
+        Pageable pageable = PageRequest.of(page, 10);
         return ResponseEntity.ok(postRepository.findById(postId).orElseThrow().getComments());
     }
 

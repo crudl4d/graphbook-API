@@ -14,12 +14,6 @@ import static org.springframework.data.neo4j.core.schema.Relationship.Direction.
 @Data
 @AllArgsConstructor
 public class Post {
-
-    public enum Visibility {
-        PUBLIC,
-        FRIENDS
-    }
-
     @Id
     @GeneratedValue
     private Long id;
@@ -34,8 +28,6 @@ public class Post {
     private User author;
     @Property
     private LocalDateTime created;
-    @Property
-    private String visibility;
 
     @Relationship(type = "LIKED_BY", direction = OUTGOING)
     private List<User> likedBy;
