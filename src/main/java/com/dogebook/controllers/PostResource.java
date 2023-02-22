@@ -49,6 +49,14 @@ public class PostResource {
         return ResponseEntity.created(new URI("/posts/" + id)).build();
     }
 
+    @GetMapping(value = "/friends", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Post>> getFriendsPosts(@RequestParam @NotNull Integer page, Principal principal) {
+        Pageable pageable = PageRequest.of(page, 10);
+        List<Post> posts = postRepository.findFriendsPostsPaginated(UserContext.getUser(principal).getId(), pageable).getContent();
+        posts.forEach(post -> post.setAuthor(userRepository.findById(postRepository.findPostAuthor(post.getId())).orElseThrow()));
+        return ResponseEntity.ok(posts);
+    }
+
     @GetMapping(value = "/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Post> getPost(@PathVariable Long postId) {
         return ResponseEntity.ok(postRepository.findById(postId).orElseThrow());

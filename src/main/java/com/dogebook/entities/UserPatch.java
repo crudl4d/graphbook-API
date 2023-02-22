@@ -1,6 +1,8 @@
 package com.dogebook.entities;
 
 import lombok.Getter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Date;
 
@@ -17,7 +19,7 @@ public class UserPatch {
                 .firstName(getFirstName())
                 .surname(getSurname())
                 .email(getEmail())
-                .password(getPassword())
+                .password(!ObjectUtils.isEmpty(getPassword()) ? new BCryptPasswordEncoder().encode(getPassword()) : null)
                 .birthDate(getBirthDate())
                 .build();
     }
