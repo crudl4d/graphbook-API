@@ -3,10 +3,10 @@
 <br />
 <div align="center">
 
-<h3 align="center">Dogebook API</h3>
+<h3 align="center">GraphBook API</h3>
 
   <p align="center">
-    This is documentation for Dogebook API project
+    This is documentation for GraphBook API project
     <br />
   </p>
 </div>
@@ -67,7 +67,7 @@ You need to install java 17 and Maven
 
 1 Clone the repo
    ```sh
-   git clone https://github.com/crudl4d/dogebook-API.git
+   git clone https://github.com/crudl4d/graphbook-API.git
    ```
 2 Install the project, either with maven or IDE
    ```sh
