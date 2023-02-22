@@ -1,5 +1,5 @@
 name: GitHub CI/CD pipeline
-run-name: ${{ github.actor }} PwCO app 🚀
+run-name: ${{ github.actor }} GraphBook app 🚀
 on: [push]
 jobs:
   test:
@@ -15,7 +15,6 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 17
@@ -23,10 +22,8 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
-
       - name: Build with Maven
         run: mvn clean install
-
       - name: Upload application
         uses: appleboy/scp-action@master
         with:
@@ -43,6 +40,4 @@ jobs:
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           port: 22
-          script: | 
-            sh /home/super/app/script.sh
-            nohup java -DDB_URI="${{ secrets.DB_URI }}" -DDB_USERNAME=${{ secrets.DB_USERNAME }} -DDB_PASSWORD="${{ secrets.DB_PASS }}" -jar ~/app/dogebook.jar > nohup.out 2> nohup.err < /dev/null &
+          script: nohup sh /home/super/app/script.sh > nohup.out 2> nohup.err < /dev/null &
