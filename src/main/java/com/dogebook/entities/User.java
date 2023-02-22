@@ -1,29 +1,48 @@
 package com.dogebook.entities;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.neo4j.core.schema.*;
+import org.springframework.data.neo4j.core.support.DateLong;
 
-import java.time.LocalDate;
-import java.util.HashSet;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 import static org.springframework.data.neo4j.core.schema.Relationship.Direction.OUTGOING;
 
 @Node("User")
 @Data
+@AllArgsConstructor
+@Builder
 public class User {
     @Id
     @GeneratedValue
     private Long id;
     @Property
-    private String name;
+    @NotBlank
+    private String firstName;
     @Property
-    private LocalDate birthDate;
+    @NotBlank
+    private String surname;
+    @Property
+    @NotBlank
+    private String email;
+    @Property
+    @NotBlank
+    private String password;
+    @Property
+    private Set<String> role;
+    @Property
+    @NotNull
+    @DateLong
+    private Date birthDate;
+    @Property
+    private String profilePicturePath;
 
     @Relationship(type = "IS_FRIENDS_WITH", direction = OUTGOING)
-    private Set<User> friends = new HashSet<>();
-    @Relationship(type = "AUTHORED", direction = OUTGOING)
-    private Set<Post> posts = new HashSet<>();
+    private List<Friend> friends;
 }

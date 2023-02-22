@@ -1,42 +1,84 @@
 package com.dogebook.controllers;
 
+import com.dogebook.configuration.UserContext;
 import com.dogebook.entities.User;
+import com.dogebook.entities.UserPatch;
 import com.dogebook.repositories.UserRepository;
+import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.Principal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/users")
 public class UserResource {
 
-    private final UserRepository userRepository;
-    public UserResource(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<List<User>> getUsers(@RequestParam @NotNull Integer page, Principal principal) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return ResponseEntity.ok(userRepository.findAll(pageable).getContent());
     }
 
-    @PostMapping
-    ResponseEntity<Void> createUser(@RequestBody User user) throws URISyntaxException {
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<List<User>> searchUsers(@RequestParam String name) {
+        String regex = ".*"+name.toLowerCase()+".*";
+        List<User> x = userRepository.findByName(regex);
+        return ResponseEntity.ok(x);
+    }
+
+    private UserRepository userRepository;
+
+    @PostMapping("/login")
+    ResponseEntity<Map<HttpHeaders, HttpStatus>> login(Principal principal) {
+        UserContext userContext = ((UserContext) ((UsernamePasswordAuthenticationToken) principal).getPrincipal());
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("id", userContext.getId().toString());
+        headers.add("name", userContext.getName());
+        headers.add("email", userContext.getEmail());
+        headers.add("role", userContext.getAuthorities().toArray()[0].toString());
+        return new ResponseEntity<>(headers, HttpStatus.OK);
+    }
+
+    @PostMapping("/register")
+    ResponseEntity<Void> registerUser(@RequestBody @Valid User user) throws URISyntaxException {
+        user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+        user.setRole(Set.of("ADMIN"));
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException();
+        }
         Long id = userRepository.save(user).getId();
         return ResponseEntity.created(new URI("/users/" + id)).build();
     }
 
     @PutMapping("/{userId}")
     ResponseEntity<Void> update(@RequestBody User user, @PathVariable("userId") Long userId) {
-        user.setId(userId);
-        userRepository.save(user);
+        if (userRepository.existsById(userId)) {
+            user.setId(userId);
+            user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
+            userRepository.save(user);
+        }
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<List<User>> getUsers(Principal principal) {
-        return ResponseEntity.ok(userRepository.findAll());
     }
 
     @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -50,9 +92,17 @@ public class UserResource {
         return ResponseEntity.noContent().build();
     }
 
-//    @ResponseBody
-//    @GetMapping(value = "{title}/directors", produces = MediaType.APPLICATION_JSON_VALUE)
-//    ResponseEntity<Set<User>> getDirectors(@PathVariable String title) {
-//        return ResponseEntity.ok(userRepository.findOneByTitle(title).block().getDirectors());
-//    }
+    @GetMapping(value = "/{userId}/profile-picture", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<byte[]> getImage(@PathVariable Long userId, @RequestParam(defaultValue = "true") boolean isThumbnail) throws IOException {
+        User user = userRepository.findById(userId).orElseThrow();
+        if (user.getProfilePicturePath() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        String fileNameAndPath = user.getProfilePicturePath();
+        if (isThumbnail) {
+            fileNameAndPath = fileNameAndPath.replace(".jpg", "-thumbnail.jpg");
+        }
+        byte[] image = Files.readAllBytes(Paths.get(fileNameAndPath));
+        return ResponseEntity.ok(image);
+    }
 }

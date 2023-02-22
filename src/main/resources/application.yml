@@ -1,18 +1,22 @@
 spring:
+  data.neo4j.database: neo4j
   security:
     user:
       name: user
       password: password
+  # Default values for local database connection, can be overridden by environment variables
   neo4j:
+    uri: ${DB_URI} #neo4j+s://426356fe.databases.neo4j.io
     authentication:
-      username: neo4j
-      password: password
-    uri: bolt://localhost:7687
-    database: dogebook
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
 
 logging:
   level:
     org:
       springframework:
+        web: debug
+        filter:
+          CommonsRequestLoggingFilter: debug
         data:
-          neo4j: DEBUG
+          neo4j: debug

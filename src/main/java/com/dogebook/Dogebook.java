@@ -1,19 +1,32 @@
 package com.dogebook;
 
-import org.neo4j.driver.AuthTokens;
-import org.neo4j.driver.Driver;
-import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.Session;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.Bean;
+import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+import java.util.Properties;
 
 @SpringBootApplication
+@EntityScan("com.dogebook.repositories")
+@EnableNeo4jRepositories
 public class Dogebook {
 
-	public static void main(String[] args) {
-		Driver driver = GraphDatabase.driver( "bolt://localhost:7687", AuthTokens.basic( "neo4j", "password" ));
-		Session session = driver.session();
-		SpringApplication.run(Dogebook.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Dogebook.class, args);
+    }
 
+    @Bean
+    public WebMvcConfigurer corsFilter() {
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**").allowedOrigins("*");
+            }
+        };
+    }
 }

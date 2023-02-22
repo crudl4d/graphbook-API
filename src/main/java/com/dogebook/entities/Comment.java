@@ -10,16 +10,10 @@ import java.util.List;
 
 import static org.springframework.data.neo4j.core.schema.Relationship.Direction.OUTGOING;
 
-@Node("Post")
+@Node("Comment")
 @Data
 @AllArgsConstructor
-public class Post {
-
-    public enum Visibility {
-        PUBLIC,
-        FRIENDS
-    }
-
+public class Comment {
     @Id
     @GeneratedValue
     private Long id;
@@ -29,16 +23,10 @@ public class Post {
     @Property
     private Long likes;
     @Property
-    private byte[] image;
-    @Property
     private User author;
     @Property
     private LocalDateTime created;
-    @Property
-    private String visibility;
 
     @Relationship(type = "LIKED_BY", direction = OUTGOING)
     private List<User> likedBy;
-    @Relationship("COMMENT_ON_POST")
-    private List<Comment> comments;
 }
