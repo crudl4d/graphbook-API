@@ -40,7 +40,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This is an API for a social service called Dogebook.
+This is an API for a social service called GraphBook.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
